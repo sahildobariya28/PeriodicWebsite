@@ -1,0 +1,765 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elemental - Premium Periodic Table App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-900: #040a1e;
+      --bg-800: #07122c;
+      --glass: rgba(255, 255, 255, 0.08);
+      --glass-strong: rgba(255, 255, 255, 0.14);
+      --line: rgba(255, 255, 255, 0.18);
+      --text: #f6fbff;
+      --muted: #9ab0cf;
+      --teal: #1df7d6;
+      --teal-soft: rgba(29, 247, 214, 0.35);
+      --violet: #8b6dff;
+      --violet-soft: rgba(139, 109, 255, 0.35);
+      --gold: #ffd466;
+      --oxygen: #8fe1ff;
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --shadow-soft: 0 20px 60px rgba(0, 0, 0, 0.42);
+      --shadow-glow: 0 0 40px rgba(29, 247, 214, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100%;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 10%, rgba(29, 247, 214, 0.26), transparent 40%),
+        radial-gradient(circle at 86% 18%, rgba(139, 109, 255, 0.3), transparent 42%),
+        radial-gradient(circle at 65% 82%, rgba(29, 247, 214, 0.15), transparent 46%),
+        radial-gradient(circle at 48% 52%, rgba(94, 130, 255, 0.12), transparent 48%),
+        linear-gradient(180deg, #030817 0%, #06122e 100%);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: -16%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(72px);
+      opacity: 0.55;
+      animation: meshDrift 18s ease-in-out infinite alternate;
+    }
+
+    body::before {
+      background: radial-gradient(circle at 26% 30%, rgba(29, 247, 214, 0.35), transparent 34%);
+    }
+
+    body::after {
+      background: radial-gradient(circle at 74% 42%, rgba(139, 109, 255, 0.38), transparent 36%);
+      animation-duration: 22s;
+    }
+
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(217, 244, 255, 0.88), rgba(139, 109, 255, 0));
+      opacity: 0.3;
+      filter: blur(0.3px);
+      animation: floatUp linear infinite;
+    }
+
+    .site {
+      position: relative;
+      z-index: 1;
+      width: min(1080px, 100% - 40px);
+      margin: 0 auto;
+      padding: 28px 0 40px;
+    }
+
+    .section {
+      padding: 72px 0;
+    }
+
+    .section-title {
+      font-size: clamp(1.7rem, 3vw, 2.6rem);
+      letter-spacing: -0.03em;
+      margin-bottom: 14px;
+    }
+
+    .section-sub {
+      color: var(--muted);
+      max-width: 62ch;
+      line-height: 1.7;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.78rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #d4e4ff;
+      margin-bottom: 16px;
+    }
+
+    .badge-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: linear-gradient(130deg, var(--teal), var(--violet));
+      box-shadow: 0 0 18px rgba(29, 247, 214, 0.9);
+    }
+
+    .hero {
+      min-height: 92vh;
+      display: grid;
+      align-items: center;
+      gap: 36px;
+      grid-template-columns: 1.05fr 0.95fr;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      max-width: 14ch;
+      margin-bottom: 18px;
+    }
+
+    .hero p {
+      color: var(--muted);
+      line-height: 1.8;
+      max-width: 50ch;
+      margin-bottom: 26px;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .store-btn {
+      display: inline-block;
+      line-height: 0;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 240ms ease, box-shadow 240ms ease;
+    }
+
+    .store-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .store-btn img {
+      width: 190px;
+      max-width: 58vw;
+      height: auto;
+      display: block;
+      border-radius: 0px;
+    }
+
+    .atom-wrap {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 460px;
+      isolation: isolate;
+    }
+
+    .atom-card {
+      width: min(440px, 100%);
+      aspect-ratio: 1/1;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.04) 48%, rgba(255, 255, 255, 0.02)),
+        radial-gradient(circle at 68% 28%, rgba(139, 109, 255, 0.3), transparent 36%),
+        radial-gradient(circle at 30% 74%, rgba(29, 247, 214, 0.28), transparent 42%),
+        rgba(255, 255, 255, 0.03);
+      box-shadow: var(--shadow-soft), var(--shadow-glow), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(28px);
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: transform 250ms ease-out;
+    }
+
+    .orbit {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      opacity: 0.82;
+    }
+
+    .o1 { width: 220px; height: 88px; transform: rotate(20deg); }
+    .o2 { width: 230px; height: 86px; transform: rotate(-26deg); }
+    .o3 { width: 210px; height: 82px; transform: rotate(82deg); }
+
+    .nucleus {
+      width: 118px;
+      height: 118px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 36% 28%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.24) 40%, rgba(31, 203, 214, 0.22));
+      border: 1px solid rgba(255, 255, 255, 0.58);
+      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.36), 0 0 45px rgba(31, 203, 214, 0.34);
+      position: relative;
+      display: grid;
+      place-items: center;
+      animation: pulse 4.2s ease-in-out infinite;
+    }
+
+    .nucleus span {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #f5fbff;
+      letter-spacing: 0.05em;
+    }
+
+    .electron {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #d5f8ff;
+      box-shadow: 0 0 18px rgba(145, 235, 255, 0.95);
+      position: absolute;
+    }
+
+    .e1 { top: -24px; left: 75px; }
+    .e2 { bottom: -18px; left: -12px; }
+    .e3 { right: -20px; bottom: 32px; }
+
+    .periodic-preview {
+      display: grid;
+      gap: 20px;
+    }
+
+    .element-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .tile {
+      position: relative;
+      border-radius: 12px;
+      min-height: 90px;
+      padding: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.04);
+      cursor: pointer;
+      transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+      overflow: hidden;
+      display: grid;
+      align-content: start;
+      gap: 4px;
+    }
+
+    .tile:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 255, 255, 0.34);
+      box-shadow: 0 0 24px rgba(139, 109, 255, 0.22);
+    }
+
+    .tile strong {
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .tile small {
+      color: #c9d7ef;
+      font-size: 0.72rem;
+      line-height: 1;
+    }
+
+    .tile-stats {
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      bottom: 8px;
+      border-radius: 10px;
+      font-size: 0.66rem;
+      padding: 6px;
+      color: #d7e6ff;
+      background: rgba(5, 16, 40, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      opacity: 0;
+      transform: translateY(7px);
+      transition: 220ms ease;
+    }
+
+    .tile:hover .tile-stats {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .tile.goldish:hover { box-shadow: 0 0 26px rgba(255, 212, 102, 0.26); }
+    .tile.oxygenish:hover { box-shadow: 0 0 26px rgba(143, 225, 255, 0.26); }
+
+    .features-grid {
+      margin-top: 26px;
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .feature {
+      border: 1px solid var(--line);
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: var(--shadow-soft);
+      transition: transform 220ms ease, border-color 220ms ease;
+    }
+
+    .feature:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.38);
+    }
+
+    .feature h3 {
+      font-size: 1.08rem;
+      margin-bottom: 8px;
+    }
+
+    .feature p {
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 0.95rem;
+    }
+
+    .feature.big { grid-column: span 7; min-height: 210px; }
+    .feature.tall { grid-column: span 5; min-height: 210px; }
+    .feature.med { grid-column: span 4; min-height: 180px; }
+
+    .explore-grid {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .element-card {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      padding: 20px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+      min-height: 220px;
+    }
+
+    .element-card::before {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      top: -70px;
+      right: -70px;
+      filter: blur(16px);
+      opacity: 0.35;
+    }
+
+    .element-card.gold::before { background: radial-gradient(circle, var(--gold), transparent 65%); }
+    .element-card.oxygen::before { background: radial-gradient(circle, var(--oxygen), transparent 65%); }
+
+    .element-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .chip {
+      font-size: 0.73rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #d4e2fb;
+    }
+
+    .symbol {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      color: #071122;
+      background: #fff;
+    }
+
+    .gold .symbol {
+      background: linear-gradient(145deg, #ffe6a3, #ffc54d);
+      box-shadow: 0 0 20px rgba(255, 212, 102, 0.5);
+    }
+
+    .oxygen .symbol {
+      background: linear-gradient(145deg, #dcf4ff, #98e0ff);
+      box-shadow: 0 0 20px rgba(143, 225, 255, 0.5);
+    }
+
+    .element-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+    }
+
+    .element-card p {
+      color: #c7d5ee;
+      line-height: 1.68;
+      font-size: 0.95rem;
+    }
+
+    .about {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      padding: 30px;
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .about p {
+      color: var(--muted);
+      line-height: 1.8;
+      max-width: 75ch;
+    }
+
+    footer {
+      padding: 34px 0 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      margin-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: #d2e0f8;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .footer-links a:hover {
+      color: #f8fbff;
+    }
+
+    .socials {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(139, 109, 255, 0.6);
+      color: #e0d9ff;
+      display: grid;
+      place-items: center;
+      text-decoration: none;
+      font-size: 0.82rem;
+      background: rgba(255, 255, 255, 0.02);
+      box-shadow: 0 0 18px rgba(139, 109, 255, 0.2);
+      transition: transform 220ms ease, border-color 220ms ease;
+    }
+
+    .social:hover {
+      transform: translateY(-2px);
+      border-color: rgba(29, 247, 214, 0.8);
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 550ms ease, transform 550ms ease;
+      transition-delay: var(--delay, 0ms);
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(105vh) scale(1); opacity: 0; }
+      20% { opacity: 0.3; }
+      100% { transform: translateY(-20vh) scale(1.2); opacity: 0; }
+    }
+
+    @keyframes meshDrift {
+      0% { transform: translate3d(-2.2%, -1.4%, 0); }
+      100% { transform: translate3d(2.2%, 1.8%, 0); }
+    }
+
+    @media (max-width: 960px) {
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        padding-top: 32px;
+      }
+
+      .atom-wrap {
+        min-height: 390px;
+      }
+
+      .feature.big,
+      .feature.tall,
+      .feature.med {
+        grid-column: span 6;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .site {
+        width: min(1080px, 100% - 28px);
+      }
+
+      .section {
+        padding: 58px 0;
+      }
+
+      .element-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .features-grid {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+      }
+
+      .feature.big,
+      .feature.tall,
+      .feature.med {
+        grid-column: auto;
+      }
+
+      .explore-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="particles" aria-hidden="true" id="particles"></div>
+
+  <main class="site">
+    <section class="hero section" id="home">
+      <div class="hero-copy reveal">
+        <span class="badge"><span class="badge-dot"></span>Elemental App</span>
+        <h1>Master the periodic table in an immersive mobile experience.</h1>
+        <p>
+          A premium chemistry companion that fuses visual elegance with scientific depth. Discover atomic behavior, compare properties, and learn faster through interactive design.
+        </p>
+        <div class="cta-row">
+          <a
+            class="store-btn"
+            href="https://play.google.com/store/apps/details?id=com.periodic.table.periodictable"
+            aria-label="Get it on Google Play"
+          >
+            <img src="playstore.png" alt="Get it on Google Play" />
+          </a>
+        </div>
+      </div>
+
+      <div class="atom-wrap reveal" style="--delay: 120ms">
+        <div class="atom-card" id="atom-card" role="img" aria-label="Floating 3D carbon atom illustration">
+          <div class="orbit o1"></div>
+          <div class="orbit o2"></div>
+          <div class="orbit o3"></div>
+          <div class="nucleus">
+            <span>C</span>
+            <i class="electron e1"></i>
+            <i class="electron e2"></i>
+            <i class="electron e3"></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section periodic-preview" id="preview">
+      <div class="reveal">
+        <h2 class="section-title">Interactive Periodic Table Preview</h2>
+        <p class="section-sub">Hover an element tile to surface quick properties like atomic mass and electronegativity in a focused, minimalist grid.</p>
+      </div>
+
+      <div class="element-grid reveal" style="--delay: 120ms" aria-label="Periodic table preview grid">
+        <article class="tile"><small>1</small><strong>H</strong><div class="tile-stats">Mass: 1.008 | EN: 2.20</div></article>
+        <article class="tile"><small>2</small><strong>He</strong><div class="tile-stats">Mass: 4.0026 | EN: -</div></article>
+        <article class="tile"><small>3</small><strong>Li</strong><div class="tile-stats">Mass: 6.94 | EN: 0.98</div></article>
+        <article class="tile"><small>6</small><strong>C</strong><div class="tile-stats">Mass: 12.011 | EN: 2.55</div></article>
+        <article class="tile oxygenish"><small>8</small><strong>O</strong><div class="tile-stats">Mass: 15.999 | EN: 3.44</div></article>
+        <article class="tile"><small>10</small><strong>Ne</strong><div class="tile-stats">Mass: 20.180 | EN: -</div></article>
+        <article class="tile"><small>11</small><strong>Na</strong><div class="tile-stats">Mass: 22.990 | EN: 0.93</div></article>
+        <article class="tile"><small>12</small><strong>Mg</strong><div class="tile-stats">Mass: 24.305 | EN: 1.31</div></article>
+        <article class="tile"><small>14</small><strong>Si</strong><div class="tile-stats">Mass: 28.085 | EN: 1.90</div></article>
+        <article class="tile"><small>15</small><strong>P</strong><div class="tile-stats">Mass: 30.974 | EN: 2.19</div></article>
+        <article class="tile"><small>17</small><strong>Cl</strong><div class="tile-stats">Mass: 35.45 | EN: 3.16</div></article>
+        <article class="tile goldish"><small>79</small><strong>Au</strong><div class="tile-stats">Mass: 196.967 | EN: 2.54</div></article>
+      </div>
+    </section>
+
+    <section class="section" id="features">
+      <div class="reveal">
+        <h2 class="section-title">Key Features</h2>
+        <p class="section-sub">A bento-grid system designed to balance scientific utility, visual fidelity, and clean learning flows.</p>
+      </div>
+
+      <div class="features-grid">
+        <article class="feature big reveal" style="--delay: 60ms">
+          <h3>3D Visualizer</h3>
+          <p>Inspect atoms and crystal structures in AR/3D with smooth gestures, dynamic bonds, and camera-depth cues for true spatial understanding.</p>
+        </article>
+        <article class="feature tall reveal" style="--delay: 120ms">
+          <h3>Smart Search</h3>
+          <p>Filter by state (Gas/Solid), Bohr model structure, atomic number ranges, and discovery year for instant, context-aware exploration.</p>
+        </article>
+        <article class="feature med reveal" style="--delay: 180ms">
+          <h3>Quiz Mode</h3>
+          <p>Gamified challenges for students with streaks, hints, and adaptive difficulty tuned to your knowledge level.</p>
+        </article>
+        <article class="feature med reveal" style="--delay: 220ms">
+          <h3>Offline Access</h3>
+          <p>Browse full elemental datasets and core visualizations without internet, ideal for classrooms and field labs.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="explore">
+      <div class="reveal">
+        <h2 class="section-title">Explore the Elements</h2>
+        <p class="section-sub">Detailed, high-contrast cards make real-world relevance instantly readable.</p>
+      </div>
+
+      <div class="explore-grid">
+        <article class="element-card gold reveal" style="--delay: 80ms">
+          <div class="element-header">
+            <span class="chip">Lustrous yellow glow</span>
+            <span class="symbol">Au</span>
+          </div>
+          <h3>Gold</h3>
+          <p>Valued for conductivity, corrosion resistance, and malleability. Gold powers high-reliability electronics, precision connectors, aerospace components, and medical diagnostics.</p>
+        </article>
+
+        <article class="element-card oxygen reveal" style="--delay: 150ms">
+          <div class="element-header">
+            <span class="chip">Ethereal blue glow</span>
+            <span class="symbol">O</span>
+          </div>
+          <h3>Oxygen</h3>
+          <p>Critical for respiration and combustion. Oxygen supports healthcare systems, steel production, wastewater treatment, and life-support infrastructure in aviation and space.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <article class="about reveal">
+        <h2 class="section-title">About Us</h2>
+        <p>
+          We build tools that make Chemistry intuitive and beautiful. Our mission is to turn complex atomic data into clear visual stories, helping students, educators, and curious minds explore matter with confidence.
+        </p>
+      </article>
+    </section>
+
+    <footer>
+      <nav class="footer-links" aria-label="Footer links">
+        <a href="about-us.html">About Us</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="mailto:contact@elemental.app">Contact</a>
+      </nav>
+      <div class="socials" aria-label="Social links">
+        <a class="social" href="#" aria-label="X">X</a>
+        <a class="social" href="#" aria-label="Instagram">IG</a>
+        <a class="social" href="#" aria-label="LinkedIn">in</a>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.14 });
+
+    reveals.forEach((el) => observer.observe(el));
+
+    const atomCard = document.getElementById('atom-card');
+    window.addEventListener('mousemove', (e) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 10;
+      const y = (e.clientY / window.innerHeight - 0.5) * -10;
+      atomCard.style.transform = `rotateX(${y}deg) rotateY(${x}deg) translateZ(0)`;
+    });
+
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      atomCard.style.translate = `0 ${Math.min(y * 0.08, 24)}px`;
+    }, { passive: true });
+
+    const particleLayer = document.getElementById('particles');
+    for (let i = 0; i < 46; i += 1) {
+      const p = document.createElement('span');
+      p.className = 'particle';
+      const size = Math.random() * 3.6 + 1.2;
+      p.style.width = `${size}px`;
+      p.style.height = `${size}px`;
+      p.style.left = `${Math.random() * 100}%`;
+      p.style.animationDuration = `${Math.random() * 12 + 14}s`;
+      p.style.animationDelay = `${Math.random() * 10}s`;
+      particleLayer.appendChild(p);
+    }
+  </script>
+</body>
+</html>
